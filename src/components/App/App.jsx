@@ -1,16 +1,25 @@
-import ContactsForm from "../ContactsForm/ContactsForm";
-import ContactsList from "../ContactsList/ContactsList";
-import SearchBox from "../SearchBox/SearchBox";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchContacts } from "../../redux/contactsOps";
+import ContactForm from "../ContactForm/ContactForm";
+import ContactList from "../ContactList/ContactList";
+import Filter from "../Filter/Filter";
 import styles from "./App.module.css";
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   return (
     <div className={styles.container}>
       <h1>Phonebook</h1>
-      <ContactsForm />
+      <ContactForm />
       <h2>Contacts</h2>
-      <SearchBox />
-      <ContactsList />
+      <Filter />
+      <ContactList />
     </div>
   );
 }
