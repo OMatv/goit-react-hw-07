@@ -1,20 +1,25 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setFilter } from "../../redux/filterSlice";
-import { selectFilter } from "../../redux/filterSlice";
+import { nanoid } from "nanoid";
 import css from "./Filter.module.css";
 
 export default function Filter() {
   const dispatch = useDispatch();
-  const filter = useSelector(selectFilter);
+  const filterId = nanoid();
 
   const handleChange = (event) => {
-    dispatch(setFilter(event.target.value));
+    dispatch(setFilter(event.currentTarget.value));
   };
 
   return (
     <div className={css.filter}>
-      <label htmlFor="filter">Find contacts by name:</label>
-      <input id="filter" type="text" value={filter} onChange={handleChange} />
+      <label htmlFor={filterId}>Find contacts by name</label>
+      <input
+        className={css.inputFilter}
+        id={filterId}
+        type="search"
+        onChange={(event) => handleChange(event)}
+      ></input>
     </div>
   );
 }

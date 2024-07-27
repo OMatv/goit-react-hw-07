@@ -1,53 +1,70 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { nanoid } from "nanoid";
+import { selectContacts } from "../../redux/selectors";
 import { addContact } from "../../redux/contactsOps";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { Notify } from "notiflix";
 import css from "./ContactForm.module.css";
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(3, "Minimum 3 letters")
-    .max(50, "Maximum 50 letters")
-    .required("This field is required"),
-  number: Yup.string()
-    .min(3, "Minimum 3 numbers")
-    .max(50, "Maximum 50 numbers")
-    .required("This field is required"),
-});
 
 export default function ContactForm() {
   const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const form = event.target;
+
+    let isContact;
+    contacts.forEach((person) => {
+      if (form.name.value.toLowerCase() === person.name.toLowerCase()) {
+        isContact = true;
+      }
+    });
+    isContact
+      ? Notify.warning(`${form.name.value} is already in your Contacts.`, {
+          timeout: 3000,
+          position: "left-top",
+          closeButton: true,
+        })
+      : dispatch(
+          addContact({
+            id: nanoid(),
+            name: form.name.value,
+            phone: form.phone.value,
+          })
+        );
+    form.reset();
+  };
+
+  const nameInputId = nanoid();
+  const numberInputId = nanoid();
 
   return (
-    <Formik
-      initialValues={{ name: "", number: "" }}
-      validationSchema={validationSchema}
-      onSubmit={(values, { resetForm }) => {
-        dispatch(addContact(values));
-        resetForm();
-      }}
-    >
-      {({ isSubmitting }) => (
-        <Form className={css.form}>
-          <div className={css.formGroup}>
-            <label htmlFor="name">Name</label>
-            <Field className={css.input} type="text" name="name" />
-            <ErrorMessage className={css.error} name="name" component="span" />
-          </div>
-          <div className={css.formGroup}>
-            <label htmlFor="number">Number</label>
-            <Field className={css.input} type="text" name="number" />
-            <ErrorMessage
-              className={css.error}
-              name="number"
-              component="span"
-            />
-          </div>
-          <button type="submit" disabled={isSubmitting}>
-            Add Contact
-          </button>
-        </Form>
-      )}
-    </Formik>
+    <form className={css.formBox} onSubmit={handleSubmit}>
+      <label htmlFor={nameInputId}>Name</label>
+      <input
+        id={nameInputId}
+        type="text"
+        name="name"
+        className={css.inputName}
+        placeholder="Enter contact's name"
+        pattern="^[a-zA-Zа-яА-Я\u0104\u0105\u0106\u0107\u0118\u0119\u0141\u0142\u0143\u0144\u00D3\u00F3\u015A\u015B\u0179\u017A\u017B\u017C]+(([' \-][a-zA-Zа-яА-Я \u0104\u0105\u0106\u0107\u0118\u0119\u0141\u0142\u0143\u0144\u00D3\u00F3\u015A\u015B\u0179\u017A\u017B\u017C])?[a-zA-Zа-яА-Я \u0104\u0105\u0106\u0107\u0118\u0119\u0141\u0142\u0143\u0144\u00D3\u00F3\u015A\u015B\u0179\u017A\u017B\u017C]*)*$"
+        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+        required
+      />
+      <label htmlFor={numberInputId}>Number</label>
+      <input
+        id={numberInputId}
+        type="tel"
+        name="phone"
+        className={css.inputName}
+        placeholder="Enter contact's number"
+        pattern="\+?\d{1,4}?[\-.\s]?\(?\d{1,3}?\)?[\-.\s]?\d{1,4}[\-.\s]?\d{1,4}[\-.\s]?\d{1,9}"
+        title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+        required
+      />
+      <button type="submit" className={css.btn} name="submit">
+        Add contact
+      </button>
+    </form>
   );
 }

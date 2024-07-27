@@ -1,0 +1,22 @@
+.contactLi {
+  margin: 4px auto 4px 8px;
+  border: 1px solid black;
+  display: flex;
+  justify-content: space-between;
+}
+.contact {
+  margin-right: 8px;
+}
+.btnDelete {
+  font-size: 10px;
+  font-weight: 500;
+  border-color: aliceblue;
+  border-radius: 4px;
+  outline: none;
+  margin-right: 10px;
+}
+.btnDelete:hover,
+.btnDelete:focus {
+  color: white;
+  background-color: rgb(69, 69, 205);
+}

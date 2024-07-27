@@ -1,35 +1,28 @@
-import { useDispatch, useSelector } from "react-redux";
-import { deleteContact } from "../../redux/contactsOps";
+import { useSelector } from "react-redux";
 import {
   selectFilteredContacts,
-  selectLoading,
-  selectError,
-} from "../../redux/selectors";
+  selectIsLoading,
+} from "../../redux/selectors.js";
+import ContactListElement from "../ContactListElement/ContactListElement.jsx";
 import css from "./ContactList.module.css";
 
 export default function ContactList() {
-  const dispatch = useDispatch();
-  const contacts = useSelector(selectFilteredContacts);
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
-
-  const handleDelete = (id) => {
-    dispatch(deleteContact(id));
-  };
+  const items = useSelector(selectFilteredContacts);
+  const isLoading = useSelector(selectIsLoading);
 
   return (
-    <div>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
-      <ul className={css.list}>
-        {contacts.map(({ id, name, number }) => (
-          <li key={id} className={css.listItem}>
-            <p>
-              {name}: {number}
-            </p>
-            <button onClick={() => handleDelete(id)}>Delete</button>
-          </li>
-        ))}
+    <div className={css.contactListBox}>
+      <h4>
+        You have {items.length} contact{items.length === 1 ? null : "s"}
+      </h4>
+      <ul className={css.contactList}>
+        {!!isLoading && <b>Loading contacts...</b>}
+        {!!items &&
+          items.map((contact) => (
+            <li key={contact.id}>
+              <ContactListElement contact={contact} />
+            </li>
+          ))}
       </ul>
     </div>
   );
